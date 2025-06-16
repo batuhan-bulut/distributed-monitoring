@@ -1,0 +1,10 @@
+image:
+  repository: grafana/tempo
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  ports:
+    otlpHttp: 14268
+    otlpGrpc: 4317
+    zipkin: 9411

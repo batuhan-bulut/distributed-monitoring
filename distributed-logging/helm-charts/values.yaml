@@ -1,0 +1,43 @@
+backend-chart:
+  image:
+    tag: "1.0"
+
+frontend-chart:
+  image:
+    tag: "1.0"
+
+grafana-chart:
+  image:
+    tag: 12.0.1-security-01
+
+loki-chart:
+  image:
+    tag: 3.5
+
+nginx-chart:
+  image:
+    tag: 1.27.5-otel
+
+otelcollector-chart:
+  image:
+    tag: 0.128.0
+
+postgres-chart:
+  image:
+    tag: 17.5
+
+redis-chart:
+  image:
+    tag: 8.0.2
+
+tempo-chart:
+  image:
+    tag: "main-0a45826"
+
+prometheus-chart:
+  image:
+    repository: prom/prometheus
+    tag: v3.4.1
+
+global:
+  namespace: monitoring

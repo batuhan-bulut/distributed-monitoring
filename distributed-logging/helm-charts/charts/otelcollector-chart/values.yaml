@@ -1,0 +1,11 @@
+image:
+  repository: otel/opentelemetry-collector-contrib
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  ports:
+    otlpHttp: 4318
+    otlpGrpc: 4317
+    promExporter1: 55679
+    promExporter2: 9464

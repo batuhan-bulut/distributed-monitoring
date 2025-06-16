@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-tempo
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-tempo
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-tempo
+    spec:
+      containers:
+        - name: tempo
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["-config.file=/etc/tempo.yaml"]
+          ports:
+            - containerPort: {{ .Values.service.ports.otlpHttp }}
+            - containerPort: {{ .Values.service.ports.otlpGrpc }}
+            - containerPort: {{ .Values.service.ports.zipkin }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/tempo.yaml
+              subPath: tempo.yaml
+            - name: tempo-storage
+              mountPath: /var/tempo
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Release.Name }}-tempo-config
+        - name: tempo-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-tempo-pvc

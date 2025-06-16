@@ -1,0 +1,18 @@
+image:
+  repository: redis
+  tag: latest
+  pullPolicy: IfNotPresent
+
+redis:
+  passwordSecretName: redis-password
+  passwordSecretKey: password
+
+service:
+  port: 6379
+
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: ""
+
+resources: {}

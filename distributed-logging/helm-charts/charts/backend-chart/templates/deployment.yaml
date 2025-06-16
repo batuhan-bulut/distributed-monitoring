@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-backend
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-backend
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-backend
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-backend
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: "{{ .Values.environment.OTEL_SERVICE_NAME }}"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://{{ .Release.Name }}-otel-collector-svc:4317"
+            - name: POSTGRES_HOST
+              value: "{{ .Release.Name }}-postgres-svc"
+            - name: REDIS_HOST
+              value: "{{ .Release.Name }}-redis-svc"
+          ports:
+            - name: http
+              containerPort: 8000
