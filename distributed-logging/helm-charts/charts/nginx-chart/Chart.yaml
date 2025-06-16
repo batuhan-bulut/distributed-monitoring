@@ -1,7 +1,0 @@
-name: nginx-chart
-version: 0.1.0
-description: A Helm chart for deploying Nginx
-appVersion: "1.21.6"
-icon: https://www.nginx.com/wp-content/themes/nginx/assets/images/logos/nginx-logo.svg
-apiVersion: v2
-type: application

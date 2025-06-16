@@ -1,9 +1,0 @@
-image:
-  repository: grafana/loki
-  tag: latest
-  pullPolicy: IfNotPresent
-
-config:
-  configMapName: loki-config
-  fileName: loki-config.yaml
-  mountPath: /etc/loki/local-config.yaml
