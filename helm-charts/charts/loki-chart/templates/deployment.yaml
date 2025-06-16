@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-loki
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-loki
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-loki
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-loki
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["-config.file=/etc/loki/config/loki-config.yaml"]
+          ports:
+            - containerPort: 3100
+          volumeMounts:
+            - name: {{ .Release.Name }}-loki-config
+              mountPath: /etc/loki/config/
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      volumes:
+        - name: {{ .Release.Name }}-loki-config
+          configMap:
+            name: {{ .Release.Name }}-loki-config

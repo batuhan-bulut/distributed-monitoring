@@ -1,0 +1,9 @@
+image:
+  repository: prom/prometheus
+  tag: latest
+  pullPolicy: IfNotPresent
+
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: ""

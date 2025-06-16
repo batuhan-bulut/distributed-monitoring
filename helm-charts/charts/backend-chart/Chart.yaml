@@ -1,0 +1,3 @@
+name: backend-chart
+version: 0.1.0
+description: A Helm chart for deploying Backend Service

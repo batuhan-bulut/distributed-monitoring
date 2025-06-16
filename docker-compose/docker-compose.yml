@@ -1,0 +1,78 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:17.5
+    container_name: my-postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:8.0.2
+    container_name: redis
+    volumes:
+      - redis_data:/data
+  tempo:
+    image: grafana/tempo:main-0a45826
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./config/tempo-config.yaml:/etc/tempo.yaml
+      - ./data/tempo-data:/var/tempo
+  otel-collector:
+      image: otel/opentelemetry-collector-contrib:0.128.0
+      container_name: otel-collector
+      command: [ "--config=/etc/otel-collector-config.yaml" ]
+      volumes:
+        - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+        - ./logs/nginx-logs:/logs/nginx
+  grafana:
+    image: grafana/grafana:12.0.1-security-01
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_ROOT_URL=http://localhost:80/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./config/grafana/dashboards/:/var/lib/grafana/dashboards/
+      - ./config/grafana/default.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+  loki:
+    container_name: loki
+    image: grafana/loki:3.5
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./config/loki-config.yaml:/etc/loki/local-config.yaml
+  nginx:
+    image: nginx:1.27.5-otel
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./config/nginx-config.conf:/etc/nginx/nginx.conf:ro
+      - ./logs/nginx-logs:/var/log/nginx
+  frontend:
+    container_name: app-frontend
+    image: bulutbatuhan/app-frontend:1.0
+    environment:
+      - OTEL_SERVICE_NAME=frontend
+  backend:
+    container_name: app-backend
+    image: bulutbatuhan/app-backend:1.0
+    environment:
+      - OTEL_SERVICE_NAME=backend
+  prometheus:
+    image: prom/prometheus:v3.4.1
+    container_name: prometheus
+    volumes:
+      - ./config/prometheus-config.yaml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+volumes:
+  postgres_data:
+  redis_data:
+  tempo_data:
+  grafana_data:

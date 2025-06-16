@@ -1,0 +1,7 @@
+image:
+  repository: bulutbatuhan/app-backend
+  tag: 1.0
+  pullPolicy: IfNotPresent
+
+environment:
+  OTEL_SERVICE_NAME: backend

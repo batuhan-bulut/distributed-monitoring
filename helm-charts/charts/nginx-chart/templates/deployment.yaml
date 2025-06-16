@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-nginx
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-nginx
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-nginx
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          volumeMounts:
+            - name: {{ .Release.Name }}-nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name : shared-logs
+              mountPath: /var/log/nginx
+        - name : {{ .Release.Name }}-otel-collector-log-read
+          image: "{{ .Values.otelCollector.image.repository }}:{{ .Values.otelCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.otelCollector.image.pullPolicy }}
+          args: ["--config=/etc/otel-collector-log-read-config.yaml"]
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: "nginx-rp"
+          volumeMounts:
+            - name: {{ .Release.Name }}-otel-collector-log-read-config
+              mountPath: /etc/otel-collector-log-read-config.yaml
+              subPath: otel-collector-log-read-config.yaml
+            - name : shared-logs
+              mountPath: /var/log/nginx
+              
+      volumes:
+        - name: {{ .Release.Name }}-nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx-config
+        - name: {{ .Release.Name }}-otel-collector-log-read-config
+          configMap:
+            name: {{ .Release.Name }}-otel-collector-log-read-config
+        - name: shared-logs
+          emptyDir: {}
